@@ -1,0 +1,35 @@
+/* 滑动验证  start */
+.nc-container #nc_1_wrapper, .nc-container.tb-login #nc_1_wrapper {
+  width: auto;
+}
+
+.nc-container .nc_scale .nc_bg {
+    background: #2b2d35;
+}
+
+.nc-container .nc_scale {
+  background: #171921;
+}
+
+.nc-container .nc_scale span {
+    background: #93959c;
+    border: 1px solid #93959c;
+}
+.nc-container .nc_scale .btn_slide {
+    color: #dfdfe1;
+}
+
+.nc-container .nc_scale .scale_text2 b {
+   color: #e1e3e9; 
+ /*  color: #74777c; */
+}
+.nc-container .nc_scale .btn_ok {
+  background: #93959c;
+}
+
+.nc-container .errloading {
+    width: auto;
+}
+
+
+/* 滑动验证  end */
