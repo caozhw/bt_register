@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-//let base = '/api';
-let base = 'http://101.132.76.80/api';
-//let base = 'list/api'; 
+let base = '/api';
+ //let base = 'list/api';
+//let base = process.env.NODE_ENV==='development'?'list/api':'marketing/list/api'; 
+// let base = 'http://118.190.132.240/api'
 
 /*let send_code = `${base}send_code`;
 let reg = `${base}reg`;

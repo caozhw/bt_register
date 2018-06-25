@@ -32,4 +32,147 @@
 }
 
 
+
+
+
+/* 滑动条高度、边框、背景色等 */
+._nc .stage1 {
+   height: 1.22rem;;
+    width: 8.54rem;
+}
+
+/* 滑动条 */
+._nc .stage1 .track div {
+   
+    color: #fff;
+}
+/* 滑动条背景色-正常 */
+._nc .stage1 .bg-green {
+    background-color: #2b2d35;
+}
+/* 滑动条背景色-失败 */
+._nc .stage1 .bg-red {
+    background-color: #ff5500;
+}
+
+._nc .stage1 .track div, ._nc .stage1 .label {
+    line-height: 1.22rem;;
+    height: 1.22rem;;
+    text-align: center;
+    font-size: 12px;
+    color: #fefefe; 
+}
+
+._nc .stage {
+  position: relative;
+  padding: 0;
+}
+
+._nc .stage1 .slider {
+    position: absolute;
+    width: 8.54rem;
+    height: 1.22rem;
+    box-shadow: 0 0 3px #999;
+    background-color: #171921;
+    left: 0;
+    right: 0;
+}
+
+._nc .stage1 .button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.62rem;
+    height: 1.22rem;
+    
+    background-color: #93959c;
+    cursor: pointer;
+}
+
+._nc .stage1 .icon {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    background-image: url("../img/icon_yz_jt@2x.png");
+    background-size: 0.4rem 0.4rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+._nc .stage1 .icon.yes {
+    background-image: url("../img/icon_yz_dui@2x.png");
+    background-size: 0.8rem 0.8rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+._nc .icon-slide-arrow:before {
+    content: "";
+}
+._nc .icon-ok:before {
+    content: "";
+}
+
+._nc .icon-slide-arrow {
+    font-size: 18px; 
+    color: #dedfe1;
+}
+
+._nc .icon {
+    line-height: 1.22rem;
+    width: auto;
+    height: auto; 
+    background-image: url("//g.alicdn.com/sd/nch5/icons.png?v=2");
+}
+
+
+._nc .stage3 .title {
+    font-size: 12px;
+    color: #777;
+    width: 100%;
+    margin:  0;
+}
+
+._nc .stage3 .menu.refresh .icon {
+   width: 0;
+    height: 0;
+    
+    background-position: 0 0;
+}
+._nc .stage3 .menu.feedback .icon { 
+    width: 0;
+    height: 0;
+    background-position: 0 0;
+}
+
+._nc .stage3 {
+    height: 1.22rem;
+}
+
+._nc .stage3 .menu.feedback {
+    display: none;
+}
+
+._nc .stage3 .menu.nc-sep {
+    outline: 0;
+    width: 0;
+    height: 0;
+    left: 0;
+}
+
+
+@media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
+    ._nc .stage1 .icon {
+        background-image: url("../img/icon_yz_jt@3x.png");
+        background-repeat: no-repeat;
+    }
+    ._nc .stage1 .icon.yes {
+        background-image: url("../img/icon_yz_dui@3x.png");
+        background-repeat: no-repeat;
+    }
+}
+
 /* 滑动验证  end */
