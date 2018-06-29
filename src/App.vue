@@ -15,6 +15,9 @@ export default {
 
 
 <style>
+#app {
+  max-width: 10rem;
+}
 /* #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

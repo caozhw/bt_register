@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-let base = '/api';
- //let base = 'list/api';
+//let base = '/api'; 
+ let base = 'list/api';  
 //let base = process.env.NODE_ENV==='development'?'list/api':'marketing/list/api'; 
 // let base = 'http://118.190.132.240/api'
 

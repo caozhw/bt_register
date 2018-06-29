@@ -1,62 +1,151 @@
 <template>
-    <div class="wrap download-wrap">
-        <div class="tip">扫码加入币客官方微信群</div>
-        <img class="scan" :src="ratio>=3?scan[3]:scan[2]"/>
-        <div class="btn_group">
-            <div class="btn_yellow"><a href="itms-services://?action=download-mianfest&url=https://img.bitker.com/download/ios/mianfest.plist">IOS下载</a></div>
-            <div class="btn_yellow"><a href='#'>安卓下载</a></div>
+  <div class="wrap">
+    <div class="bg_bot"> 
+      <div class="height50"></div>
+      <div class="height50"></div>
+      <div class="height50"></div>
+      <div class="height50"></div>
+      <div class="height50"></div>
+      <img class="scan" :src="ratio>=3?scan[3]:scan[2]"/>
+      <div class="height50"></div>
+     <!--  <div class="btn_group">
+         <div class="btn_yellow" @click="handleIosClick"><a class="download_android" :download="ios_download" :href="ios_download">IOS下载</a>></div> 
+         <div class="btn_yellow"><a class="download_android" :href="android_download">安卓下载</a></div>
+     </div>  -->
+     <div class="tip">加入币客官方微信群<br>微信扫码或添加微信号 bitkerservice</div>
+     <div class="dec_footer">币客 Bitker,一站式数字货币交易平台</div>
+      <!-- <div class="weixin font15"  :style="{display:isWeixin?'block':'none'}">
+        <div  class='f1'>
+          请点击右上角“ 
+          <i class='spot ml2'></i>
+          <i class='spot'></i>
+          <i class='spot mr2'></i>
+           ”
         </div>
-        <div class="dec_footer">币客 Bitker,一站式数字货币交易平台</div>  
+        <div class="height20"></div>
+        <div class='f2'>
+          选择在<span class='f_color'>浏览器</span>中打开 ~
+        </div>
+        <div class="arrow"></div>
+      </div>    -->
     </div>
+  </div>
 </template>
 <script>
 export default {
   data() {
     return {
       scan: {
-        2: './static/img/pic_ewm@2x.png',
+        2: './static/img/pic_ewm@2x.png', 
         3: './static/img/pic_ewm@3x.png'
       },
-      ratio: 2
+      ratio: 2,
+      isiOS:false,
+      isWeixin:false,
+      ios_download:'itms-services://?action=download-manifest&url=https://download.bitker.com/ios/mianfest.plist',
+      android_download:'https://download.bitker.com/android/app-Bitker-release.apk'
     };
   },
   created() {
     this.ratio = window.devicePixelRatio;
+    
+  },
+  mounted() {
+    this.download();
+    this.is_weixin();
+  },
+  methods:{
+    handleIosClick(){
+      if(this.isiOS){
+        this.ios_download = "itms-services://?action=download-manifest&url=https://download.bitker.com/ios/mianfest.plist";
+      } 
+
+       /*let aLink = document.createElement('a');
+       aLink.href = this.ios_download;
+       aLink.download = this.ios_download; 
+       console.log(aLink) 
+       aLink.click(); */
+       //console.log(aLink.click())   
+    },
+    download(){
+      let ua = window.navigator.userAgent;
+      this.isiOS = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+      
+  /*    $('.download_ios').click(function () {
+          if(isiOS){
+            // ios下载链接
+            $('.download_ios').attr('href',"itms-services://?action=download-manifest&url=https://download.bitker.com/ios/mianfest.plist");   
+          }else{
+            if(this.is_weixin()){
+              //$('.weixin').show();
+              // 安卓微信浏览器下载地址
+              $('.download').attr('href','#');
+            }
+            //else{
+              // 安卓浏览器下载apk文件
+              $('.download').attr('href','https://download.bitker.com/android/app-Bitker-release.apk');
+            //}
+          }
+      });*/
+      
+    },
+    is_weixin(){ 
+      let ua = window.navigator.userAgent;
+      if(ua.toLowerCase().match(/MicroMessenger/i)=="micromessenger") {
+          this.isWeixin = true;
+          
+      } else {
+          this.isWeixin = false;
+      }
+    }
   }
 };
 </script>
-<style lang="less" scoped>
-@import "~@/styles/public.less";
-.download-wrap {
-  .ratio-bg-img("~@/assets/pic_bg_xz");
+<style scoped>
+
+.wrapper {
   max-width: 10rem;
-  background-position: 0 0;
-  background-size: contain;
-  background-color: #0a0c14;
-  background-repeat: no-repeat;
-  min-height: 100vh;
+  margin: 0 auto;
+  position: relative;
 }
+
+.bg_bot {
+  text-align: center;
+  background-image: url("../assets/pic_bg_xz@2x.png");
+  background-size: 10rem auto;
+  background-repeat: no-repeat;
+  padding-top: 4.32rem;
+}
+
+
 .tip {
   text-align: center;
-  padding-top: 4.97rem;
-  line-height: 100%;
+  line-height: 0.6rem;
   color: #fff;
   font-size: 0.4rem;
+
+  
 }
 .scan {
   display: block;
-  margin: 0.57rem auto 1rem;
+  margin: auto;
   width: 6rem;
   padding: 0.47rem;
   border-radius: 0.2rem;
   background: #23252c;
+  position: relative;
+
+
 }
 .btn_group {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  .btn_yellow {
+  
+}
+
+/* .btn_group  .btn_yellow {
     text-align: center;
     width: 3.73rem;
     height: 1.2rem;
@@ -66,23 +155,33 @@ export default {
     border-radius: 0.07rem;
     font-size: 0.45rem;
     color: #03061d;
-    a {
-      color: inherit;
-      color: currentColor;
-      display: inline-block;
-      width: 100%;
-      height: 100%;
-    }
-    &:not(:first-child) {
-      margin-left: 0.83rem;
-    }
+   
+
   }
-}
+
+.btn_group .btn_yellow  a{
+  color: inherit;
+  color: currentColor;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  z-index:999;
+} */
 
 .dec_footer {
   font-size: 0.29rem;
   color: #5c5d60;
   text-align: center;
-  padding: 1.72rem 0 0.39rem;
+  padding: 0.72rem 0 0.39rem;
+
 }
+
+@media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
+  .bg_bot {
+    background-image: url("../assets/pic_bg_xz@3x.png");
+    background-repeat: no-repeat;
+  }
+
+}
+
 </style>

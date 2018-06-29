@@ -14,20 +14,20 @@
         <div :class="reg_type==1?'show':'hide'">
           <div class="input_box font14">
             <label class="font_color_light left">{{en_number}}</label>
-            <input class="left" type='text' placeholder="手机号" v-model="username" />
+            <input class="left" type='text' placeholder="手机号"  @keyup="handleTelKeyup($event)" v-model="username_tel" />
           </div>
           <div class="input_box font14"> 
-            <input type='text' class='yzm left' placeholder="短信验证码" v-model="check_code" />
-            <input type="button"  class="yzm_btn font_color_light left" @click="hadleCodeClick" v-model="mobile_checkCode" >
+            <input type='text' class='yzm left' placeholder="短信验证码"  @keyup="handleTelCodeKeyup($event)" v-model="check_code_mipt" />
+            <input type="button"  class="yzm_btn font_color_light left"  @click="hadleCodeClick" v-model="mobile_checkCode" >
           </div>
         </div>
 
         <div :class="reg_type==2?'show':'hide'" >
           <div class="input_box font14">
-            <input class="left email_ipt" type='text' placeholder="邮箱地址" v-model="username" />
+            <input class="left email_ipt" type='text' placeholder="邮箱地址"  @keyup="handleEmailKeyup($event)" v-model="username_email" />
           </div>
           <div class="input_box font14">
-            <input type='text' class='yzm left' placeholder="邮箱验证码" />
+            <input type='text' class='yzm left' placeholder="邮箱验证码"  @keyup="handleEmailCodeKeyup($event)" v-model="check_code_eipt" />
             <input type="button" class="yzm_btn font_color_light left" @click="hadleCodeClick" v-model="email_checkCode" >
           </div>
         </div>
@@ -46,7 +46,9 @@
             <span :class="se1Class()"></span>
             <span :class="se2Class() "></span>
             <span :class="se3Class() "></span>
+            <strong :class="pwdStrengthClass()" >{{pwdStrength}}</strong>
           </div>
+          
         </div>
         <!-- 滑动验证 -->
          <div class="ln2">
@@ -97,10 +99,18 @@ export default {
       password: "",
       check_code: "",
       source: "",
+      sales:"",
+
+      check_code_mipt:"",
+      check_code_eipt:"",
+
+      username_tel:"",
+      username_email:"",
 
       en_name: "China",
       en_number: "0086",
 
+      pwdStrength:"",
       showPwd: false,
       checkCode: "",
       mobile_checkCode: "获取验证码",
@@ -113,6 +123,11 @@ export default {
       isGreen: false,
       isYellow: false,
 
+      isTel:false,
+      isEmail:false,
+
+      isSendCode:false,
+
       /*滑动验证*/
       nc_appkey: "FFFF00000000017ABCF9",
       modelName: "no-captcha",
@@ -122,15 +137,17 @@ export default {
       nc_option: null,
       csessionid: null,
       sig: null,
-
       countryList: []
     };
   },
   mounted: function() {
-    this.judgeDevice();
-    this.init();
+    this.judgeDevice(); 
+    //this.init(); 
     this.getMobileDeviceWh();
     this.getCountry();
+
+    this.source = this.getQueryString("source");
+    this.sales = this.getQueryString("sales");  
   },
   methods: {
     //阿里滑块验证引入 ---start
@@ -156,19 +173,25 @@ export default {
           console.log("self.csessionid", self.csessionid);
           console.log("self.sig", self.sig);
 
+          //发送验证码
+          //this.isSendCode = true;  
+         /* if(self.sig !=null && self.csessionid !=null && !this.isSendCode){
+            self.askCode();  
+          } */ 
+
           //将这三个参数在这里回调服务器的接口，进行服务器的验证
         },
         error: function (s) {
         },
         verifycallback: function (data) {
           if (data.code == "200") {
-             
+             console.log(data)
           }
         }
       };
       ////g.alicdn.com/sd/nch5/index.js?t=1529400685813
       this.$api.loadJs(
-        `http://g.alicdn.com/sd/nch5/index.js?t=${this.setRequestTime()}`,
+        `//g.alicdn.com/sd/nch5/index.js?t=${this.setRequestTime()}`,
         {
           success(data) {
             self.generarte();
@@ -177,7 +200,7 @@ export default {
       );
     },
     generarte() {
-      var nc =  NoCaptcha.init(this.nc_option);
+      let nc =  NoCaptcha.init(this.nc_option);
       NoCaptcha.setEnabled(true);
       nc.reset();//请务必确保这里调用一次reset()方法
       NoCaptcha.upLang('cn', {
@@ -191,6 +214,13 @@ export default {
     });
     },
     //阿里滑块验证引入 ---end
+    //获取url参数
+    getQueryString(name) { 
+        let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+        let r = window.location.search.substr(1).match(reg); 
+        if (r != null) return unescape(r[2]); 
+        return null; 
+    },
     //判断设备
     judgeDevice() {
       let ua = window.navigator.userAgent;
@@ -251,6 +281,31 @@ export default {
       //console.log(ev.key);
       this.passwordTest(this.password);
     },
+
+    handleTelKeyup(ev){
+     /* let isPass = this.check_code_mipt != "" && this.password !="";
+      if(isPass){
+        this.init();
+      }*/
+    },
+    handleTelCodeKeyup(ev){
+     /* let isPass = this.username_tel != "" && this.password !="";
+      if(isPass){
+        this.init();
+      }*/
+    },
+    handleEmailKeyup(ev){
+      /*let isPass = this.username_code_eipt != "" && this.password !="";
+      if(isPass){
+        this.init();
+      }*/
+    },
+    handleEmailCodeKeyup(ev){
+      /*let isPass = this.username_email != "" && this.password !="";
+      if(isPass){
+        this.init();
+      }*/
+    },
     //密码测试
     passwordTest(pwd) {
       let china = new RegExp("[\\u4E00-\\u9FFF]+", "g");
@@ -267,6 +322,23 @@ export default {
       this.isRed = isRed;
       this.isGreen = isGreen;
       this.isYellow = isYellow;
+
+      if(this.isYellow){
+        this.pwdStrength = "强";
+      }
+      else if(this.isGreen){
+        this.pwdStrength = "中";
+      }
+      else if(this.isRed){
+        this.pwdStrength = "弱";
+      }
+      //显示滑动
+      /*var isPass = (this.isRed||this.isGreen||this.isYellow) && 
+      if(this.isRed||this.isGreen||this.isYellow){
+        this.init();  
+      }else{
+        $('stage').hide();
+      }*/
     },
     se1Class() {
       if (this.isYellow) {
@@ -295,102 +367,118 @@ export default {
         return "se3";
       }
     },
+    pwdStrengthClass(){
+      if (this.isYellow) {
+        return "yellow";
+      } else if (this.isGreen) {
+        return "green";
+      } else if (this.isRed) {
+        return "red"; 
+      } else {
+        return "";
+      }
+    },
     //判断纯数字最低8位
     pureDigit(pwd) {
-      let number = /^\d{0,}$/;
+     /* let number = /^\d{0,}$/;
       let isNumber = number.test(pwd);
 
       if (isNumber) {
       } else {
-      }
+      }*/
     },
     // 手机验证
     mobile_test(tel){
-        if(!/^\d{6,11}$/.test(tel))
-        {
-            // $(".mob").siblings('.input_mess').html("请输入正确的手机号码");
-            // $(".mob").siblings('.input_mess').show();
-            // $(".mob").children(".mob_ma").removeClass("whit");
-            // $(".mob").children(".mob_ma").addClass("red");
-            return false;
-        }
-        else
-        {
-            // $(".mob").siblings('.input_mess').html("");
-            // $(".mob").siblings('.input_mess').hide();
-            // $(".mob").children(".mob_ma").removeClass("red");
-            return true;
-        }
+      if(!/^\d{11}$/.test(tel))
+      //if(!/^\d{6,11}$/.test(tel))
+      {
+        this.prompt = "请输入正确的手机号码";
+        this.promptShow();
+        this.isTel = false;
+      }else{
+          this.isTel = true; 
+      }
     },
     // 邮箱验证
-   email_test(email){
-        if(!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(email))
-        {
-            // $("#email").addClass("red");
-            // $("#email").siblings('.input_mess').html("请输入正确的邮箱地址");
-            // $("#email").siblings('.input_mess').show();
-            return false;
-        }
-        else
-        {
-            // $("#email").removeClass("red");
-            // $("#email").siblings('.input_mess').html("");
-            // $("#email").siblings('.input_mess').hide();
-            return true;
-        }
+    email_test(email){
+      if(!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(email))
+      {
+        this.prompt = "请输入正确的邮箱地址";
+        this.promptShow();
+        this.isEmail = false;
+        
+      }
+      else{
+       this.isEmail = true;
+      }
     },
     //获取验证码
     hadleCodeClick(ev) {
+      if(this.reg_type == 1){
+        this.username = this.username_tel;
+        this.mobile_test(this.username);
+        
+      }else if(this.reg_type == 2){
+        this.username = this.username_email;
+        this.email_test(this.username);
+      }
+      if(this.reg_type == 1&&this.isTel || this.reg_type == 2&&this.isEmail){
+        this.askCode(); 
+        /*this.init();
+        this.prompt = "请滑动滑块发送验证码";
+        this.promptShow();*/
+      }
+    },
+    askCode(){
+      $('.yzm_btn').attr('disabled',true);
       let _this = this;
       let url = "send_code";
-      // console.log('==========================')
-      // if(this.reg_type ===1&&this.mobile_test(this.username)||this.email_test(this.username)){
-      //   console.log('yan zheng guo')
-      // }else{
-      //   return
-      // }
       let getCheckCodeParams = {
         reg_type: this.reg_type,
         username: this.username,
         country_id: this.country_id,
         from_type: this.from_type
       };
-      requestApi(url, getCheckCodeParams).then(response => {
-        let { msg, status, data } = response;
-        if (status != 200) {
-          this.prompt = msg;
-          $(".prompt").fadeIn();
-          let pmtTime = window.setTimeout(function() {
-            $(".prompt").fadeOut();
-            window.clearInterval(pmtTime);
-          }, 3000);
-        } else {
-          let mobile_second = 59,
-            email_second = 59;
-          //修改发送验证码按钮
-          if (this.reg_type == 1) {
-            let mTime = window.setInterval(() => {
-              if (mobile_second > 0) {
-                _this.mobile_checkCode = `${mobile_second}s`;
-                mobile_second--;
-              } else {
-                _this.mobile_checkCode = "获取验证码";
-                window.clearInterval(mTime);
-              }
-            }, 1000);
-          } else if (this.reg_type == 2) {
-            let eTime = window.setInterval(() => {
-              if (email_second > 0) {
-                _this.email_checkCode = `${email_second}s`;
-                email_second--;
-              } else {
-                _this.email_checkCode = "获取验证码";
-                window.clearInterval(eTime);
-              }
-            }, 1000);
+      //if(this.reg_type == 1&&this.isTel || this.reg_type == 1&&this.isEmail){
+        requestApi(url, getCheckCodeParams).then(response => {
+          let { msg, status, data } = response;
+          if (status != 200) {
+            this.prompt = msg;
+            this.promptShow();
+          } else {
+            this.isSendCode = true;
+            let mobile_second = 59,
+              email_second = 59;
+            //修改发送验证码按钮
+            if (this.reg_type == 1) {
+              let mTime = window.setInterval(() => {
+                if (mobile_second > 0) {
+                 
+                  _this.mobile_checkCode = `${mobile_second}s`;
+                  mobile_second--;
+                } else {
+                   $('.yzm_btn').removeAttr('disabled');
+                  _this.mobile_checkCode = "获取短信验证码";
+                  window.clearInterval(mTime);
+                }
+              }, 1000);
+            } else if (this.reg_type == 2) {
+              let eTime = window.setInterval(() => {
+                if (email_second > 0) {
+                  $('.yzm_btn').attr('disabled',true);
+                  _this.email_checkCode = `${email_second}s`;
+                  email_second--;
+                } else {
+                  $('.yzm_btn').removeAttr('disabled');
+                  _this.email_checkCode = "获取邮箱验证码";
+                  window.clearInterval(eTime);
+                }
+              }, 1000);
+            }
           }
-        }
-      });
+        }); 
+
+      //}
     },
     //注册
     handleRegClick() {
@@ -398,8 +486,25 @@ export default {
       let url = "reg";
       // http://ln.beker.com/?act=register&source=1&sales=2
       let sales = this.$route.query.sales || "";
-      let source = this.$route.query.source||this.source
+      let source = this.$route.query.source||this.source;
+
+      if(this.reg_type == 1){
+        this.username = this.username_tel;
+        this.check_code = this.check_code_mipt;
+       /* if(!this.check_code){
+            this.prompt = "请输入手机验证码";
+            this.promptShow();
+        } */
+      }else{
+        this.username = this.username_email;
+        this.check_code = this.check_code_eipt;
+        /*if(!this.check_code){
+            this.prompt = "请输入邮箱验证码"; 
+            this.promptShow();
+        } */
+      }
       let regParams = {
+        reg_type:this.reg_type,
         from_type: this.from_type,
         username: this.username,
         country_id: this.country_id,
@@ -408,31 +513,39 @@ export default {
         csessionid: this.csessionid,
         sig: this.sig,
         token: this.nc_token,
-        source,
-        sales
+        source:this.source, 
+        sales:this.sales
       };
-      requestApi(url, regParams).then(response => {
-        let { msg, status, data } = response;
-        //console.log(response);
-        if (status != 200) {
-          this.init(); 
-          this.prompt = msg;
-          $(".prompt").fadeIn();
-          let pmtTime = window.setTimeout(function() {
-            $(".prompt").fadeOut();
-            window.clearInterval(pmtTime);
-          }, 2000);
-          
-          $('#dom_id').css('display','block');
-        } else {
-          $(".alert_success_bg").fadeIn();
-          let asTime = window.setTimeout(function() {
-            $(".alert_success_bg").fadeOut();
-            window.clearInterval(asTime);
-            _this.$router.push({name:'download'})
-          }, 2000);
-        }
-      });
+      let isPass = this.isRed||this.isYellow||this.isGreen ;
+      if(isPass) { 
+        requestApi(url, regParams).then(response => {
+          let { msg, status, data } = response;
+          //console.log(response);
+          if (status != 200) {
+            this.init();  
+            this.prompt = msg;
+            this.promptShow();
+          } else {
+            $(".alert_success_bg").fadeIn();
+            let asTime = window.setTimeout(function() {
+              $(".alert_success_bg").fadeOut();
+              window.clearInterval(asTime);
+              _this.$router.push({name:'download'});
+            }, 2000);
+          }
+        });
+      }else{
+        this.prompt = "密码8-20位不能为纯数字";
+        this.promptShow();
+      } 
+    },
+    //弹出提示
+    promptShow(){
+      $(".prompt").fadeIn();
+        let pmtTime = window.setTimeout(function() {
+          $(".prompt").fadeOut();
+          window.clearInterval(pmtTime);
+        }, 2000);
     },
     getCountry() {
       let _this = this;
@@ -624,7 +737,7 @@ export default {
   line-height: 0.6rem;
   margin: 0 auto;
   text-align: center;
-  background-color: #484646;
+  background-color: #000;
   color: #fff;
   border-radius: 0.2rem;
   padding: 0.2rem;
@@ -666,6 +779,16 @@ export default {
 }
 .wrapper .bg_bot .strength .up span.yellow {
   background-color: #f2ad3e;
+}
+
+.wrapper .bg_bot .strength .up strong.red {
+  color: #cc4e45;
+}
+.wrapper .bg_bot .strength .up strong.green {
+  color: #66be91;
+}
+.wrapper .bg_bot .strength .up strong.yellow {
+  color: #f2ad3e;
 }
 
 @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
