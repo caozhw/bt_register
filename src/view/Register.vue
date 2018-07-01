@@ -1,6 +1,9 @@
 <template>
     <div class="wrapper">
       <div class="bg_bot">
+      <div class="title"></div>
+      <div class="new" :style="{display:inviterTel!=''?'none':'block'}"></div>
+      <div class="ask font12" :style="{display:inviterTel!=''?'block':'none'}">您的好友 <span>{{inviterTel}}</span> 邀您注册</div>
         <div class="tab font14">
           <span :class="reg_type==1?'line':''" data-type="mobile" @click="handleTabClick(1)">手机注册</span>
           <span :class="reg_type==2?'line':''" data-type="email" @click="handleTabClick(2)">邮箱注册</span>
@@ -58,17 +61,18 @@
         <input type='hidden' id='sig' name='sig' v-model="sig"/>
         <input type='hidden' id='token' name='token' v-model="nc_token"/>
         <input type='hidden' id='scene' name='scene' v-model="nc_scene"/>
-        <div class="height20"></div>
         <div class="height50"></div>
+        <div class="ask_code" :style="{display:inviteCode?'block':'none'}" >
+          <span class="font12" >推荐人邀请码：</span>
+          <em class="font14">{{inviteCode}}</em>
+        </div>
         <label class='reader font12'>
           注册即代表已阅读并同意<a href="https://www.bitker.com/wap/register_contract" target="_blank" class="agree">《用户协议》</a>
         </label>
         <div class="height20"></div>
         <input class='register_btn font18' type="submit" value="注册" @click="handleRegClick" id="register">
-        <div class="height20"></div>
         <div class="height50"></div>
         <label class="footer font12">币客Bitker，一站式数字货币交易平台</label>
-        <div class="height20"></div>
         <div class="height50"></div>
       </div>
       <div class="alert_success_bg">
@@ -137,7 +141,10 @@ export default {
       nc_option: null,
       csessionid: null,
       sig: null,
-      countryList: []
+      countryList: [],
+
+      inviteCode:"",
+      inviterTel:""
     };
   },
   mounted: function() {
@@ -148,6 +155,9 @@ export default {
 
     this.source = this.getQueryString("source");
     this.sales = this.getQueryString("sales");  
+
+    this.inviteCode = this.getQueryString("invite_code"); 
+    //this.getInviterInfo();
   },
   methods: {
     //阿里滑块验证引入 ---start
@@ -561,6 +571,24 @@ export default {
           this.countryList = data;
         }
       });
+    },
+    getInviterInfo(){
+      let url = "inviter_info";
+      if(this.inviteCode != ""){
+        let params = {
+          invite_code:this.inviteCode,
+          username:this.username
+        }
+        requestApi(url, params).then(response => {
+        let { msg, status, data } = response;
+        //console.log(response);
+        if (status != 200) {
+        } else {
+          this.inviterTel = data.username;
+        }
+      });
+      }
+
     }
   }
 };
@@ -581,15 +609,50 @@ export default {
 }
 .wrapper .bg_bot {
   text-align: center;
-  background-image: url("../assets/pic_bg@2x.png");
+  background-image: url("../assets/bg@2x.png");
   background-size: 10rem auto;
   background-repeat: no-repeat;
-  padding-top: 4.32rem;
+  padding-top: 1.64rem;
+}
+
+
+.wrapper .bg_bot .title{
+  height: 0.75rem;
+  text-align: center;
+  background-image: url("../assets/wz@2x.png");
+  background-size: 4rem 0.75rem;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.wrapper .bg_bot .new{
+  height: 0.47rem;
+  text-align: center;
+  background-image: url("../assets/zs@2x.png");
+  background-size: 5rem 0.47rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding-top: 0.22rem;
+}
+.wrapper .bg_bot .ask{
+  color:#b4b7bd;
+  padding-top: 0.22rem;
+}
+
+.wrapper .bg_bot  .ask_code{
+  padding: 0.2rem 0;
+}
+.wrapper .bg_bot  .ask_code span{
+  color:#74777c;
+}
+.wrapper .bg_bot  .ask_code em{
+  color:#b4b7bd;
 }
 .wrapper .bg_bot .tab {
   color: #b4b7bd;
   margin: 0 auto;
   height: 0.8rem;
+  padding-top: 1.5rem;
 }
 .wrapper .bg_bot .tab span {
   margin: 0 0.73rem;
@@ -793,7 +856,7 @@ export default {
 
 @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
   .wrapper .bg_bot {
-    background-image: url("../assets/pic_bg@3x.png");
+    background-image: url("../assets/bg@3x.png");
     background-repeat: no-repeat;
   }
   .wrapper .bg_bot .input_box .select_country {
@@ -810,6 +873,10 @@ export default {
   }
   .wrapper .alert_success_bg .success_icon {
     background-image: url("../assets/icon_chenggong@3x.png");
+    background-repeat: no-repeat;
+  }
+  .wrapper .bg_bot .title{
+    background-image: url("../assets/wz@3x.png");
     background-repeat: no-repeat;
   }
 }
