@@ -1,19 +1,22 @@
 <template>
   <div class="wrap">
     <div class="bg_bot"> 
+      <div class="title font18">{{title}}</div>
       <div class="height50"></div>
       <div class="height50"></div>
       <div class="height50"></div>
-      <div class="height50"></div>
+      <div class="login">登录 www.bitker.com </div>
+      <div class="konw_more font18">查看到账金额</div>
       <div class="height50"></div>
       <img class="scan" :src="ratio>=3?scan[3]:scan[2]"/>
-      <div class="height50"></div>
+      <div class="height20"></div>
      <!--  <div class="btn_group">
          <div class="btn_yellow" @click="handleIosClick"><a class="download_android" :download="ios_download" :href="ios_download">IOS下载</a>></div> 
          <div class="btn_yellow"><a class="download_android" :href="android_download">安卓下载</a></div>
      </div>  -->
-     <div class="tip">加入币客官方微信群<br>微信扫码或添加微信号 bitkerservice</div>
+     <div class="tip">加群了解更多</div>
      <div class="dec_footer">币客 Bitker,一站式数字货币交易平台</div>
+     <div class="height20"></div>
       <!-- <div class="weixin font15"  :style="{display:isWeixin?'block':'none'}">
         <div  class='f1'>
           请点击右上角“ 
@@ -35,6 +38,8 @@
 export default {
   data() {
     return {
+      title:null,
+      inviteCode:'',
       scan: {
         2: './static/img/pic_ewm@2x.png', 
         3: './static/img/pic_ewm@3x.png'
@@ -53,6 +58,9 @@ export default {
   mounted() {
     this.download();
     this.is_weixin();
+    this.inviteCode = this.getQueryString("invite_code");
+    console.log('1',this.inviteCode )
+    this.showTitle(); 
   },
   methods:{
     handleIosClick(){
@@ -97,6 +105,21 @@ export default {
       } else {
           this.isWeixin = false;
       }
+    },
+    //获取url参数
+    getQueryString(name) { 
+        let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+        let r = window.location.search.substr(1).match(reg); 
+        if (r != null) return unescape(r[2]); 
+        return null; 
+    },
+    showTitle(){
+      console.log(this.inviteCode)
+      if(this.inviteCode==null){
+        this.title = '立即领取BKB';
+      }else{
+        this.title = '我的BKB礼包：已到账';
+      }
     }
   }
 };
@@ -111,12 +134,27 @@ export default {
 
 .bg_bot {
   text-align: center;
-  background-image: url("../assets/pic_bg_xz@2x.png");
+  background-image: url("../assets/xz@2x.png");
   background-size: 10rem auto;
   background-repeat: no-repeat;
-  padding-top: 4.32rem;
+  padding-top: 3.72rem;
 }
 
+.title{
+  color: #f7ca81;
+}
+
+.login{
+  text-align: center;
+  line-height: 0.6rem;
+  color: #fff;
+  font-size: 0.4rem;
+  padding: 0.2rem 0;
+}
+
+.konw_more{
+  color: #f5bb41;
+}
 
 .tip {
   text-align: center;
@@ -178,7 +216,7 @@ export default {
 
 @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
   .bg_bot {
-    background-image: url("../assets/pic_bg_xz@3x.png");
+    background-image: url("../assets/xz@3x.png");
     background-repeat: no-repeat;
   }
 

@@ -13,8 +13,8 @@ module.exports = {
     proxyTable: {
 
         '/list':{ 
-            //target:'http://101.132.76.80',
-            target:'http://118.190.132.240',
+            target:'http://101.132.76.80',
+            //target:'http://118.190.132.240',
             changeOrigin:true,
             pathRewrite: {
                 '^/list': ''   //需要rewrite的,

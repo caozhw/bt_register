@@ -1,18 +1,14 @@
 import Register from "./view/Register.vue";
 import Download from "@/view/download";
+import Countrylist from "@/view/Countrylist";
 
 let routes = [
-  /* {
+   /* {
         path: '/login',
         component: Login,
         name: '',
         hidden: true
     },*/
-  {
-    path: "/",
-    component: Register,
-    name: "注册"
-  },
   /* {
         path: '/404',
         component: NotFound,
@@ -21,9 +17,20 @@ let routes = [
     },*/
   //{ path: '/main', component: Main },
   {
+    path: "/",
+    component: Register,
+    name: "Register"
+  },
+
+  {
     path: "/download",
     name: "download",
     component: Download
+  },
+   {
+    path: "/Countrylist",
+    name: "Countrylist",
+    component: Countrylist
   }
 ];
 

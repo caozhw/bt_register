@@ -38,4 +38,19 @@ const requestApi = (url,params) => {
   .then(res => res.data); 
 };
 
-export {requestApi}
+//wap/sign_package
+
+const requestWxApi = (url,params) => {
+  let baseUrl = `list/${url}`;
+  //let baseUrl = `/${url}`;   
+  return axios({
+        method:'post',
+        url:baseUrl,
+        data:params,
+        headers:{'token':cQsxv0_act}
+    })
+  //return axios.post(baseUrl,params)
+  .then(res => res.data); 
+};
+
+export {requestApi,requestWxApi}

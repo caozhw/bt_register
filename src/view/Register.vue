@@ -10,7 +10,7 @@
         </div>
         <div class="height20"></div>
         <div class="input_box font14">
-          <label class="select_country left">国籍</label>
+          <label class="select_country left" @click="handleSelectCountryClick">国籍</label>
           <input class="font_color_light left" type='text' v-model="en_name" />
         </div>
         
@@ -91,10 +91,12 @@
 
 <script>
 import $ from "jquery";
-import { requestApi } from "../api/axios.js";
+import { requestApi ,requestWxApi} from "../api/axios.js";
+//import imgUrl from '../assets/wxt.png';
 export default {
   data() {
     return {
+      
       reg_type: 1, //1手机 2 邮箱
       country_id: 1,
       from_type: 4, //1 PC /2 iOS/ 3 Android /4 H5
@@ -144,7 +146,12 @@ export default {
       countryList: [],
 
       inviteCode:"",
-      inviterTel:""
+      inviterTel:"",
+
+      appId:"",
+      timestamp:"",
+      nonceStr:"",
+      signature:""
     };
   },
   mounted: function() {
@@ -157,7 +164,16 @@ export default {
     this.sales = this.getQueryString("sales");  
 
     this.inviteCode = this.getQueryString("invite_code"); 
-    //this.getInviterInfo();
+    this.getInviterInfo();
+
+    //国籍
+    this.country_id = this.getQueryString("id")?Number(this.getQueryString("id")):1;
+    this.en_name = this.getQueryString("en_name")?this.getQueryString("en_name"):"China";
+    this.en_number = this.getQueryString("number")?"+"+this.getQueryString("number"):"0086"; 
+
+    //微信
+    this.getwxInfo();
+    //this.setWeixin();
   },
   methods: {
     //阿里滑块验证引入 ---start
@@ -316,6 +332,9 @@ export default {
         this.init();
       }*/
     },
+    handleSelectCountryClick(){
+       this.$router.push({name:'Countrylist'}); 
+    },
     //密码测试
     passwordTest(pwd) {
       let china = new RegExp("[\\u4E00-\\u9FFF]+", "g");
@@ -455,6 +474,7 @@ export default {
           if (status != 200) {
             this.prompt = msg;
             this.promptShow();
+            $('.yzm_btn').removeAttr('disabled'); 
           } else {
             this.isSendCode = true;
             let mobile_second = 59,
@@ -493,6 +513,7 @@ export default {
     //注册
     handleRegClick() {
       let _this = this;
+
       let url = "reg";
       // http://ln.beker.com/?act=register&source=1&sales=2
       let sales = this.$route.query.sales || "";
@@ -524,7 +545,8 @@ export default {
         sig: this.sig,
         token: this.nc_token,
         source:this.source, 
-        sales:this.sales
+        sales:this.sales,
+        invite_code:this.inviteCode
       };
       let isPass = this.isRed||this.isYellow||this.isGreen ;
       if(isPass) { 
@@ -540,7 +562,7 @@ export default {
             let asTime = window.setTimeout(function() {
               $(".alert_success_bg").fadeOut();
               window.clearInterval(asTime);
-              _this.$router.push({name:'download'});
+              _this.$router.push({name:'download',query:{invite_code:this.inviteCode}});
             }, 2000);
           }
         });
@@ -576,19 +598,101 @@ export default {
       let url = "inviter_info";
       if(this.inviteCode != ""){
         let params = {
-          invite_code:this.inviteCode,
-          username:this.username
+          invite_code:this.inviteCode
         }
         requestApi(url, params).then(response => {
-        let { msg, status, data } = response;
-        //console.log(response);
-        if (status != 200) {
-        } else {
-          this.inviterTel = data.username;
-        }
-      });
+          let { msg, status, data } = response;
+          //console.log(response);
+          if (status != 200) {
+          } else {
+            this.inviterTel = data.username;
+          }
+        });
       }
+    },
+    getwxInfo(){
+      let url = "wap/sign_package";
+      let params = {url:window.location.href};
+       requestWxApi(url, params).then(response => {
+          let { msg, status, data } = response;
+          //console.log(response);
+          if (status != 200) {
+          } else {
+            console.log('wx',data);
+            this.appId = data.signPackage.appId;
+            this.nonceStr = data.signPackage.nonceStr;
+            this.signature = data.signPackage.signature;
+            this.timestamp = data.signPackage.timestamp;
+            this.setWeixin()
+          }
+        });
 
+    },
+/*    loadWeixinJs(){
+      let self = this;
+      this.$api.loadJs(
+        `../../static/lib/jseixin-1.0.0.js`,
+        {
+          success(data) {
+            self.setWeixin();
+          }
+        }
+      );
+    },*/
+    setWeixin(){
+      /*var app_id = "<?php echo $signPackage['appId']; ?>";
+        var timestamp = "<?php echo $signPackage['timestamp']; ?>";
+        var nonceStr = "<?php echo $signPackage['nonceStr']; ?>";
+        var signature = "<?php echo $signPackage['signature']; ?>";*/
+        wx.config({
+            debug: false,
+            appId: this.appId,
+            timestamp: this.timestamp,
+            nonceStr: this.nonceStr,
+            signature: this.signature,
+           /* appId: app_id,
+            timestamp: timestamp,
+            nonceStr: nonceStr,
+            signature: signature,*/
+            jsApiList: [
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage'
+            ]
+        });
+        wx.ready(function () {
+            wx.onMenuShareAppMessage({
+                title: 'BKB暴涨2.4倍，你还在等什么？立刻加入',
+                desc: '币客BITKER注册送总量1000万BKB,限首期用户',
+                link:window.location.href,
+                //link: 'http://wx.5ipt.cn/static/present_bkb',
+                //imgUrl: "/wap/images/share/wxt.png",
+                //imgUrl: imgUrl,
+                imgUrl: "http://wx.5ipt.cn/wap/images/share/wxt.png",
+                trigger: function (res) {
+                },
+                cancel: function (res) {
+                },
+                fail: function (res) {
+                }
+            });
+            wx.onMenuShareTimeline({
+                title: 'BKB暴涨2.4倍，你还在等什么？立刻加入',
+                desc: '币客BITKER注册送总量1000万BKB,限首期用户',
+                link:window.location.href,
+                //link: 'http://wx.5ipt.cn/static/present_bkb',
+                //imgUrl: imgUrl,
+                imgUrl: "http://wx.5ipt.cn/wap/images/share/wxt.png",
+                trigger: function (res) {
+                },
+                cancel: function (res) {
+                },
+                fail: function (res) {
+                }
+            });
+            wx.error(function (res) {
+              //alert(res);
+            });
+        });
     }
   }
 };
