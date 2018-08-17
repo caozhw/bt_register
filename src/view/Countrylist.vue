@@ -274,7 +274,7 @@ export default {
 </script>
 <style>
 .wrapper{
-  min-height:19rem;  
+  min-height:18rem;  
   background: -webkit-linear-gradient(top, #161e2e 0%,#141224 100%);
 }
 /* .header {

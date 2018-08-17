@@ -1,9 +1,9 @@
 <template>
     <div class="wrapper">
       <div class="bg_bot">
-      <div class="title"></div>
-      <div class="new" :style="{display:inviterTel!=''?'none':'block'}"></div>
-      <div class="ask font12" :style="{display:inviterTel!=''?'block':'none'}">您的好友 <span>{{inviterTel}}</span> 邀您注册</div>
+        <div class="title font32">币客BITKER</div>
+        <div class="new font16">一站式数字资产交易所</div>
+        <div class="ask font12" :style="{display:inviterTel!=''?'block':'none'}">您的好友 <span>{{inviterTel}}</span> 邀您注册</div>
         <div class="tab font14">
           <span :class="reg_type==1?'line':''" data-type="mobile" @click="handleTabClick(1)">手机注册</span>
           <span :class="reg_type==2?'line':''" data-type="email" @click="handleTabClick(2)">邮箱注册</span>
@@ -40,9 +40,12 @@
           <input :type="showPwd?'text':'password'" class="pwd left" placeholder="登录密码" v-model="password"   @focus="handlePwdFocus" @blur="handlePwdBlur" @keyup="handlePwdKeyup($event)" />
           <div :class="showPwd?'eye-open left':'eye-close left'" @click="handleEyeClick" ></div> 
         </div>
+         <div class="input_box font14" :style="{display:!inviteCode?'block':'none'}">
+          <input type='text' class="left"  placeholder="邀请码" v-model="inviteCode"  />
+        </div>
          <div class="height20"></div>
          <!-- <div class="strength"  > -->
-       <div class="strength"  :style="{display:isPwdFocus?'block':'none'}" > 
+        <div class="strength"  :style="{display:isPwdFocus?'block':'none'}" > 
           <label class="font12">8-20位不能为纯数字</label>
           <div class="height20"></div>
           <div class="up">
@@ -74,11 +77,15 @@
         <div class="height50"></div>
         <label class="footer font12">币客Bitker，一站式数字货币交易平台</label>
         <div class="height50"></div>
+       <!--  <div class="height50"></div> -->
       </div>
-      <div class="alert_success_bg">
-        <div class="alert_success">
-          <div class="success_icon"></div>
+      <div class="alert_success_bg" :style="{display:alertSuccess==1?'block':'none'}">
+        <div class="alert_success" :style="{display:registerSuccess==1?'block':'none'}">
+          <div class="success_icon" ></div>
           <p class="font16">注册完成</p>
+        </div>
+        <div class="success_loading" :style="{display:registerSuccess==0?'block':'none'}">
+          <p class="font16">注册中，请稍后...</p>
         </div>
       </div>
       <div class="prompt">
@@ -96,7 +103,8 @@ import { requestApi ,requestWxApi} from "../api/axios.js";
 export default {
   data() {
     return {
-      
+      alertSuccess:0,
+      registerSuccess:1,
       reg_type: 1, //1手机 2 邮箱
       country_id: 1,
       from_type: 4, //1 PC /2 iOS/ 3 Android /4 H5
@@ -146,7 +154,7 @@ export default {
       countryList: [],
 
       inviteCode:"",
-      inviterTel:"",
+      inviterTel:"34234",
 
       appId:"",
       timestamp:"",
@@ -156,7 +164,7 @@ export default {
   },
   mounted: function() {
     this.judgeDevice(); 
-    //this.init(); 
+    this.init(); 
     this.getMobileDeviceWh();
     this.getCountry();
 
@@ -172,7 +180,7 @@ export default {
     this.en_number = this.getQueryString("number")?"+"+this.getQueryString("number"):"0086"; 
 
     //微信
-    this.getwxInfo();
+    //this.getwxInfo();
     //this.setWeixin();
   },
   methods: {
@@ -237,7 +245,10 @@ export default {
         'CHECK_N':"验证未通过", //准备唤醒二次验证
         'OVERLAY_INFORM':"经检测你当前操作环境存在风险，请输入验证码",//二次验证
         'TIPS_TITLE':"验证码错误，请重新输入"//验证码输错时的提示
-    });
+      });
+      nc.on('success',function(){
+        nc.functionName('show')
+      })
     },
     //阿里滑块验证引入 ---end
     //获取url参数
@@ -289,6 +300,7 @@ export default {
     handleTabClick(reg_type) {
       this.reg_type = reg_type;
       this.username = "";
+      this.password = "";
     },
     //显示隐藏密码
     handleEyeClick() {
@@ -550,19 +562,24 @@ export default {
       };
       let isPass = this.isRed||this.isYellow||this.isGreen ;
       if(isPass) { 
+        _this.alertSuccess = 1;
+        _this.registerSuccess = 0;
         requestApi(url, regParams).then(response => {
           let { msg, status, data } = response;
           //console.log(response);
           if (status != 200) {
+            _this.alertSuccess = 0;
             this.init();  
             this.prompt = msg;
             this.promptShow();
           } else {
-            $(".alert_success_bg").fadeIn();
+            _this.alertSuccess = 1;
+            _this.registerSuccess = 1;
             let asTime = window.setTimeout(function() {
-              $(".alert_success_bg").fadeOut();
+               _this.alertSuccess = 0;
               window.clearInterval(asTime);
-              _this.$router.push({name:'download',query:{invite_code:this.inviteCode}});
+              window.location.href='/wap/download'+location.search; 
+              //_this.$router.push({name:'download',query:{invite_code:this.inviteCode}});
             }, 2000);
           }
         });
@@ -605,12 +622,12 @@ export default {
           //console.log(response);
           if (status != 200) {
           } else {
-            this.inviterTel = data.username;
+            //this.inviterTel = data.username;
           }
         });
       }
     },
-    getwxInfo(){
+   /* getwxInfo(){
       let url = "wap/sign_package";
       let params = {url:window.location.href};
        requestWxApi(url, params).then(response => {
@@ -628,32 +645,21 @@ export default {
         });
 
     },
-/*    loadWeixinJs(){
-      let self = this;
-      this.$api.loadJs(
-        `../../static/lib/jseixin-1.0.0.js`,
-        {
-          success(data) {
-            self.setWeixin();
-          }
-        }
-      );
-    },*/
     setWeixin(){
-      /*var app_id = "<?php echo $signPackage['appId']; ?>";
-        var timestamp = "<?php echo $signPackage['timestamp']; ?>";
-        var nonceStr = "<?php echo $signPackage['nonceStr']; ?>";
-        var signature = "<?php echo $signPackage['signature']; ?>";*/
+        //var app_id = "<?php echo $signPackage['appId']; ?>";
+        //var timestamp = "<?php echo $signPackage['timestamp']; ?>";
+        //var nonceStr = "<?php echo $signPackage['nonceStr']; ?>";
+        //var signature = "<?php echo $signPackage['signature']; ?>";
         wx.config({
             debug: false,
             appId: this.appId,
             timestamp: this.timestamp,
             nonceStr: this.nonceStr,
             signature: this.signature,
-           /* appId: app_id,
-            timestamp: timestamp,
-            nonceStr: nonceStr,
-            signature: signature,*/
+            //appId: app_id,
+            //timestamp: timestamp,
+            //nonceStr: nonceStr,
+            //signature: signature,
             jsApiList: [
                 'onMenuShareTimeline',
                 'onMenuShareAppMessage'
@@ -693,7 +699,7 @@ export default {
               //alert(res);
             });
         });
-    }
+    }*/
   }
 };
 </script>
@@ -714,33 +720,40 @@ export default {
 .wrapper .bg_bot {
   text-align: center;
   background-image: url("../assets/bg@2x.png");
+  /* background-image: url("../assets/pic_bg@2x.png"); */
   background-size: 10rem auto;
   background-repeat: no-repeat;
-  padding-top: 1.64rem;
+  padding-top: 1.44rem;
 }
 
 
 .wrapper .bg_bot .title{
-  height: 0.75rem;
+  height: 1.12rem;
   text-align: center;
-  background-image: url("../assets/wz@2x.png");
-  background-size: 4rem 0.75rem;
+  background: -webkit-linear-gradient( #f9d69d, #f4b857);
+  background: linear-gradient( #f9d69d, #f4b857);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 600;
+  
+  /* background-size: 4rem 0.75rem;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center; */
 }
 
 .wrapper .bg_bot .new{
   height: 0.47rem;
   text-align: center;
-  background-image: url("../assets/zs@2x.png");
-  background-size: 5rem 0.47rem;
-  background-repeat: no-repeat;
+ color: #f7ca81;
+  /* background-size: 5rem 0.47rem;
+  background-repeat: no-repeat; */
   background-position: center;
-  padding-top: 0.22rem;
+  padding-top: 0.12rem;
 }
 .wrapper .bg_bot .ask{
   color:#b4b7bd;
-  padding-top: 0.22rem;
+  padding-top: 0.28rem;
 }
 
 .wrapper .bg_bot  .ask_code{
@@ -756,7 +769,8 @@ export default {
   color: #b4b7bd;
   margin: 0 auto;
   height: 0.8rem;
-  padding-top: 1.5rem;
+ /*  padding-top: 3rem; */
+   padding-top: 1.5rem; 
 }
 .wrapper .bg_bot .tab span {
   margin: 0 0.73rem;
@@ -886,6 +900,10 @@ export default {
   top: 40%;
   padding: 0.4rem;
 }
+.wrapper .alert_success_bg  .success_loading{
+  position: relative;
+  top: 40%;
+}
 .wrapper .alert_success_bg p {
   color: #e1e3e9;
 }
@@ -961,6 +979,7 @@ export default {
 @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
   .wrapper .bg_bot {
     background-image: url("../assets/bg@3x.png");
+   /*  background-image: url("../assets/pic_bg@3x.png"); */
     background-repeat: no-repeat;
   }
   .wrapper .bg_bot .input_box .select_country {
@@ -980,8 +999,11 @@ export default {
     background-repeat: no-repeat;
   }
   .wrapper .bg_bot .title{
-    background-image: url("../assets/wz@3x.png");
+    /* background-image: url("../assets/wz@3x.png"); */
     background-repeat: no-repeat;
   }
 }
+
+
+
 </style>
